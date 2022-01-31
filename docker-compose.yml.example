@@ -1,0 +1,38 @@
+version: "3"
+services: 
+  postgresql:
+    image: postgres:12.7
+    container_name: 'postgresql'
+    restart: always
+    environment: 
+      - POSTGRES_USER=emilio
+      - POSTGRES_PASSWORD=emilio2k19
+      - POSTGRES_DB=logysto
+    ports: 
+      - 5432:5432
+  pgadmin:
+    image: dpage/pgadmin4:6
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: "emiliocaraballo9810@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "emilio2k19"
+    ports:
+      - "8080:80"
+    depends_on: 
+      - postgresql
+
+  appbackend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: node
+    container_name: 'appbackend'
+    environment: 
+      - DB_HOST=postgresql
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - postgresql
+# volumes:
+#   postgresql:
+#     external: false
