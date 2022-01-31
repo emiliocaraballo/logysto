@@ -53,6 +53,10 @@ $ npm run dev
 
 # production mode
 $ npm run build
+# posiblemente falle por motivo de permiso en el archivo package.json
+# en el script clear el esta eliminado la carpeta dist/ cada vez que compila.
+# el directorio de proyecto tiene que tener los permiso necesario.
+# para eviar eliminar dist/ de forma manual.
 $ npm run start
 ```
 
