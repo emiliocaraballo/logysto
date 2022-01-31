@@ -84,19 +84,19 @@ class UserController {
         const { name,lastname,identification,phone,email,password }: IUser = req.body;
         
         /**validar*/
-        if(!general.validateData("string",name,1)){
+        if(!general.validateData("string",name,1,100)){
            return res.status(400).json({
                 code:0,
                 message: 'Nombre es obligatorio.'
             });
         }
-        if(!general.validateData("string",lastname,1)){
+        if(!general.validateData("string",lastname,1,100)){
             return res.status(400).json({
                  code:0,
                  message: 'Apellido es obligatorio.'
              });
          }
-        if(!general.validateData("string",identification,1)){
+        if(!general.validateData("string",identification,1,15)){
             return res.status(400).json({
                  code:0,
                  message: 'Identificación es obligatorio.'
@@ -108,13 +108,13 @@ class UserController {
                  message: 'Celular es obligatorio y solo permite 10 dígito.'
              });
          }
-         if(!general.validateData("mail",email,1)){
+         if(!general.validateData("mail",email,1,255)){
             return res.status(400).json({
                  code:0,
                  message: 'Email es obligatorio o verifique formato.'
              });
          }
-         if(!general.validateData("string",password,1)){
+         if(!general.validateData("string",password,1,255)){
             return res.status(400).json({
                  code:0,
                  message: 'Password es obligatorio.'

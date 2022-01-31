@@ -64,7 +64,7 @@
                   },
                   "identification": {
                     "type": "string",
-                    "example": "Caraballo Dueñas"
+                    "example": "1001972281"
                   },
                   "email": {
                     "type": "string",
