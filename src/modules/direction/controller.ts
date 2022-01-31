@@ -23,7 +23,6 @@ class DirectionController {
         var lat=Number(req.query.lat);
         var lon=Number(req.query.lon);
 
-        console.log(country,lat,lon);
         
 
         if(!general.validateData("string",direction,1)){
@@ -101,7 +100,7 @@ class DirectionController {
             }
         }
         var status=resultDirection.length>0;
-        return res.status((status)?200:404).json({code:resultDirection.length>0,data:resultDirection,message:status?'':'No hay resultado en los 2 proveedores.'});
+        return res.status((status)?200:404).json({code:resultDirection.length>0?1:0,data:resultDirection,message:status?'':'No hay resultado en los 2 proveedores.'});
     }
 }
 export const directionController = new DirectionController;

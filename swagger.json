@@ -12,20 +12,12 @@
     },
     "tags": [
       {
-        "name": "services",
-        "description": "Rutas de Servicios"
-      },
-      {
         "name": "users",
         "description": "Rutas de Usuarios"
       },
       {
-        "name": "technicals",
-        "description": "Rutas de Asesores"
-      },
-      {
-        "name": "orders",
-        "description": "Rutas de Órdenes"
+        "name": "directions",
+        "description": "Consulta de direccion"
       }
     ],
     "schemes": [
@@ -40,94 +32,14 @@
       }
     },
     "paths": {
-      "/service": {
-        "get": {
-          "tags": [
-            "services"
-          ],
-          "summary": "Obtener listado de servicios",
-          "operationId": "getservice",
-          "description": "En esta listado cada item tiene su id y titulo el id es importante al momento de realizar la implementacion\n de la api/order ya que en esta parte se necesita agregar la columna service y aqui se agrega el id de servicios.\n",
-          "produces": [
-            "application/json"
-          ],
-          "responses": {
-            "200": {
-              "description": "la solicitud se ha realizado correctamente.",
-              "schema": {
-                "$ref": "#/definitions/Service"
-              }
-            },
-            "400": {
-              "description": "El servidor no pudo entender la solicitud debido a una sintaxis incorrecta.",
-              "schema": {
-                "$ref": "#/definitions/ErrorResponse"
-              }
-            },
-            "404": {
-              "description": "Recurso no fue encontrado.",
-              "schema": {
-                "$ref": "#/definitions/ErrorResponse"
-              }
-            }          }
-        },
-        "post": {
-          "tags": [
-            "services"
-          ],
-          "summary": "Crear Servicios",
-          "operationId": "createService",
-          "description": "Se crea un servicio nuevo y se retorna un json indicado si se registro con exito o no\n",
-          "produces": [
-            "application/json"
-          ],
-          "security": [
-            {
-              "Bearer": []
-            }
-          ],
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "schema": {
-                "properties": {
-                  "title": {
-                    "type": "string",
-                    "example": "titulo"
-                  },
-                  "description": {
-                    "type": "string",
-                    "example": "Descripción"
-                  }
-                }
-              }
-            }
-          ],
-          "responses": {
-            "201": {
-              "description": "se ha realizado correctamente y, como resultado, se ha creado un nuevo recurso.",
-              "schema": {
-                "$ref": "#/definitions/Success"
-              }
-            },
-            "400": {
-              "description": "El servidor no pudo entender la solicitud debido a una sintaxis incorrecta.",
-              "schema": {
-                "$ref": "#/definitions/ErrorResponse"
-              }
-            }
-          }
-        }
-      },
-      "/user": {
+      "/users": {
         "post": {
           "tags": [
             "users"
           ],
           "summary": "Crear Usuario",
           "operationId": "createUser",
-          "description": "Se crea un usuario nuevo y se retorna un json indicado si se registro con exito o no\n y devuelve un token esto se debe colocar en el header de api/order para identificar que usuario esta realizado la solicitud.",
+          "description": "Se crea un usuario nuevo y se retorna un json indicado si se registro con exito o no\n y devuelve un token esto se debe colocar en el header de api/direction/search para identificar que usuario esta realizado la solicitud.",
           "produces": [
             "application/json"
           ],
@@ -150,6 +62,10 @@
                     "type": "string",
                     "example": "Caraballo Dueñas"
                   },
+                  "identification": {
+                    "type": "string",
+                    "example": "Caraballo Dueñas"
+                  },
                   "email": {
                     "type": "string",
                     "example": "emiliocaraballo9810@gmail.com"
@@ -157,6 +73,10 @@
                   "phone": {
                     "type": "string",
                     "example": "3042334893"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "123456"
                   }
                 }
               }
@@ -174,18 +94,80 @@
               "schema": {
                 "$ref": "#/definitions/ErrorResponse"
               }
+            },
+            "404": {
+              "description": "El servidor no pudo entender la solicitud debido a una sintaxis incorrecta.",
+              "schema": {
+                "$ref": "#/definitions/ErrorResponse"
+              }
             }
           }
         }
       },
-      "/order": {
+      "/users/login": {
         "post": {
           "tags": [
-            "orders"
+            "users"
           ],
-          "summary": "Crear Order",
-          "operationId": "createOrder",
-          "description": "Se genera una order\n",
+          "summary": "Login",
+          "operationId": "login",
+          "description": "Credenciales para obtener token.",
+          "produces": [
+            "application/json"
+          ],
+          "security": [
+            {
+              "Bearer": []
+            }
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "schema": {
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "emiliocaraballo9810@gmail.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "El {token} es para añadirlo en el headers de api/direction/search para poder realizar consulta de direccion y {tokenrefresh} es para cuando se expire el token desde api/users/refresh genere uno nuevo y nuevamente lo agregar para realizar consultas de direcciones.",
+              "schema": {
+                "$ref": "#/definitions/SuccessUserLogin"
+              }
+            },
+            "400": {
+              "description": "El servidor no pudo entender la solicitud debido a una sintaxis incorrecta.",
+              "schema": {
+                "$ref": "#/definitions/ErrorResponse"
+              }
+            },
+            "404": {
+              "description": "El servidor no pudo entender la solicitud debido a una sintaxis incorrecta.",
+              "schema": {
+                "$ref": "#/definitions/ErrorResponse"
+              }
+            }
+          }
+        }
+      },
+      "/users/refresh": {
+        "post": {
+          "tags": [
+            "users"
+          ],
+          "summary": "Refresh",
+          "operationId": "refresh",
+          "description": "Una vez expire el token con el tokenrefresh puede general un nuevo token y volvero hacer hasta que expire el tokenrefresh",
           "produces": [
             "application/json"
           ],
@@ -198,36 +180,28 @@
             {
               "in": "header",
               "name": "Authorization",
+              "example":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOiIxMWZlNzIzYS1iOTBiLTQwYTEtYjU2MS1lYjZiYzBiZWRmMTgifX0sImlhdCI6MTY0MzYwNzg0MywiZXhwIjoxNjQzNjA4NzQzfQ.a5SoWVBD6wbPt-CgQ4T57VDtF88Olu6Z6lYCNOHIp18",
               "type": "string",
-              "required": true,
-              "example": "Copiar y pegar en el input de Authorization \n eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOjEsImVtYWlsIjoiZW1pbGlvY2FyYWJhbGxvOTgxMEBnbWFpbC5jb20iLCJwaG9uZSI6IjMwNDIzMzQ4OTMifX0sImlhdCI6MTY0MzA4OTU2OCwiZXhwIjoxNjQzNjk3OTY4fQ.dcLBKVN-bO7bmmOgq4gg6u0e8NY2ZP5nPSmGxfX5ZfE"
+              "required": true
             },
             {
               "in": "body",
               "name": "body",
               "schema": {
                 "properties": {
-                  "service": {
-                    "type": "number",
-                    "example": "1"
-                  },
-                  "subject": {
+                  "email": {
                     "type": "string",
-                    "example": "Pruebas"
-                  },
-                  "priority": {
-                    "type": "string",
-                    "example": "normal"
+                    "example": "emiliocaraballo9810@gmail.com"
                   }
                 }
               }
             }
           ],
           "responses": {
-            "201": {
-              "description": "se ha realizado correctamente y, como resultado, se ha creado un nuevo recurso.",
+            "200": {
+              "description": "El {token} es para añadirlo en el headers de api/direction/search para poder realizar consulta de direccion y {tokenrefresh} es para cuando se expire el token desde api/users/refresh genere uno nuevo y nuevamente lo agregar para realizar consultas de direcciones.",
               "schema": {
-                "$ref": "#/definitions/SuccessOrder"
+                "$ref": "#/definitions/SuccessUserLogin"
               }
             },
             "400": {
@@ -235,18 +209,24 @@
               "schema": {
                 "$ref": "#/definitions/ErrorResponse"
               }
+            },
+            "401": {
+              "description": "Error de token.",
+              "schema": {
+                "$ref": "#/definitions/ErrorResponse"
+              }
             }
           }
         }
       },
-      "/technicals": {
-        "post": {
+      "/direction/search": {
+        "get": {
           "tags": [
-            "technicals"
+            "directions"
           ],
-          "summary": "Crear Technicals",
-          "operationId": "createtechnicals",
-          "description": "Crear un Asesor se requiere agregar varios asesores para poder escoger aleatoriamente al momento de general la orden en api/order\n",
+          "summary": "Consultar direcciones",
+          "operationId": "direction",
+          "description": "Aqui podra realizar consultar de direcciones con alguno parametro como lat,lon,country para que cuando busque la direccion este lo mas cercano posible y si en el primer proveedor no se encontra salta a otro para verificar si existe o no. de lo contrario devuelve un mensaje indicado que no encontro nada.",
           "produces": [
             "application/json"
           ],
@@ -257,58 +237,47 @@
           ],
           "parameters": [
             {
-              "in": "body",
-              "name": "body",
-              "schema": {
-                "properties": {
-                  "names": {
-                    "type": "string",
-                    "example": "Emilio Fernando Caraballo Dueñas"
-                  },
-                  "phone": {
-                    "type": "string",
-                    "example": "3042334893"
-                  },
-                  "email": {
-                    "type": "string",
-                    "example": "emiliocaraballo9810@gmail.com"
-                  }
-                }
-              }
-            }
-          ],
-          "responses": {
-            "201": {
-              "description": "se ha realizado correctamente y, como resultado, se ha creado un nuevo recurso.",
-              "schema": {
-                "$ref": "#/definitions/Success"
-              }
+              "in": "header",
+              "example":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOiIxMWZlNzIzYS1iOTBiLTQwYTEtYjU2MS1lYjZiYzBiZWRmMTgifX0sImlhdCI6MTY0MzYwNzg0MywiZXhwIjoxNjQzNjA4NzQzfQ.a5SoWVBD6wbPt-CgQ4T57VDtF88Olu6Z6lYCNOHIp18",
+              "name": "Authorization",
+              "type": "string",
+              "required": true
             },
-            "400": {
-              "description": "El servidor no pudo entender la solicitud debido a una sintaxis incorrecta.",
-              "schema": {
-                "$ref": "#/definitions/ErrorResponse"
-              }
+            {
+              "in": "query",
+              "name": "direction",
+              "example":"chile",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "in": "query",
+              "name": "country",
+              "example":"CO",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "in": "query",
+              "name": "lat",
+              "example":"10.39548",
+              "required": false,
+              "type": "number"
+            },
+            {
+              "in": "query",
+              "name": "lon",
+              "example":"-75.51444",
+              "required": false,
+              "type": "number"
+             
             }
-          }
-        }
-      },
-      "/technical/orders": {
-        "get": {
-          "tags": [
-            "technicals"
-          ],
-          "summary": "Obtener listado de Ordenes asignada a los asesores.",
-          "operationId": "getTechnicalsOrder",
-          "description": "Este listado obtiene todo los asesores con su ordenes asociadas con la informacion a detalle.\n",
-          "produces": [
-            "application/json"
           ],
           "responses": {
             "200": {
-              "description": "la solicitud se ha realizado correctamente.",
+              "description": "",
               "schema": {
-                "$ref": "#/definitions/TechnicalsOrder"
+                "$ref": "#/definitions/SuccessDirection"
               }
             },
             "400": {
@@ -318,90 +287,16 @@
               }
             },
             "404": {
-              "description": "Recurso no fue encontrado.",
+              "description": "No encontro ninguna dirección.",
               "schema": {
                 "$ref": "#/definitions/ErrorResponse"
               }
-            }          }
+            }
+          }
         }
       }
     },
     "definitions": {
-      "Service": {
-        "required": [
-          "title",
-          "description"
-        ],
-        "properties": {
-          "code": {
-            "type": "number",
-            "example":"1"
-          },  
-          "service":{
-            "type":"array",
-            "items":{
-              "type":"object",
-              "example":
-              {
-                "id":1,
-                "title":"Service #1",
-                "description":"Pruebas",
-                "create_at":"2022-01-25 11:51:56",
-                "update_at":"2022-01-25 11:51:56"
-              }
-            }
-          }
-        }
-      },
-      "TechnicalsOrder": {
-        "required": [
-        ],
-        "properties": {
-          "code": {
-            "type": "number",
-            "example":"1"
-          },  
-          "data":{
-            "type":"array",
-            "items":{
-              "type":"object",
-              "example":
-              {
-                "id": 1,
-                "names": "Emilio Fernando Caraballo Dueñas",
-                "phone": "3042334893",
-                "email": "emiliocaraballo9810@gmail.com",
-                "created_at": "2022-01-26T12:22:08.288Z",
-                "updated_at": "2022-01-26T12:22:08.288Z",
-                "order": [
-                    {
-                        "id": 1,
-                        "subject": "Pruebas",
-                        "created_at": "2022-01-26T12:22:08.441Z",
-                        "updated_at": "2022-01-26T12:22:08.441Z",
-                        "service": {
-                            "id": 1,
-                            "title": "Service #1",
-                            "description": "Pruebas",
-                            "created_at": "2022-01-26T12:22:08.225Z",
-                            "updated_at": "2022-01-26T12:22:08.225Z"
-                        },
-                        "user": {
-                            "id": 1,
-                            "name": "Emilio Fernando",
-                            "lastname": "Caraballo Dueñas",
-                            "email": "emiliocaraballo9810@gmail.com",
-                            "phone": "3042334893",
-                            "created_at": "2022-01-26T12:22:08.376Z",
-                            "updated_at": "2022-01-26T12:22:08.376Z"
-                        }
-                    }
-                ]
-              }
-            }
-          }
-        }
-      },
       "Success":{
         "required": [
           "code",
@@ -421,50 +316,81 @@
       "SuccessUser":{
         "required": [
           "code",
-          "message",
-          "token"
+          "message"
         ],
         "properties": {
           "code": {
             "type": "number",
             "example": "1"
-          },
-          "token": {
-            "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOjEsImVtYWlsIjoiZW1pbGlvY2FyYWJhbGxvOTgxMEBnbWFpbC5jb20iLCJwaG9uZSI6IjMwNDIzMzQ4OTMifX0sImlhdCI6MTY0MzA4OTU2OCwiZXhwIjoxNjQzNjk3OTY4fQ.dcLBKVN-bO7bmmOgq4gg6u0e8NY2ZP5nPSmGxfX5ZfE"
           },
           "message": {
             "type": "string",
             "example": "Se ha registrado exitosamente"
           }
         }
-      },
-      "SuccessOrder":{
+      },  
+      "SuccessUserLogin":{
         "required": [
           "code",
-          "message",
-          "token",
-          "order"
+          "message"
         ],
         "properties": {
           "code": {
             "type": "number",
             "example": "1"
           },
-          "order":{
-            "type": "number",
-            "example": "9"
-          },
-          "token": {
-            "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOjEsImVtYWlsIjoiZW1pbGlvY2FyYWJhbGxvOTgxMEBnbWFpbC5jb20iLCJwaG9uZSI6IjMwNDIzMzQ4OTMifX0sImlhdCI6MTY0MzA4OTU2OCwiZXhwIjoxNjQzNjk3OTY4fQ.dcLBKVN-bO7bmmOgq4gg6u0e8NY2ZP5nPSmGxfX5ZfE"
+          "data":{
+            "type":"array",
+            "items":{
+              "type":"object",
+              "example":
+              {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOiIxMWZlNzIzYS1iOTBiLTQwYTEtYjU2MS1lYjZiYzBiZWRmMTgifX0sImlhdCI6MTY0MzYwNzg0MywiZXhwIjoxNjQzNjA4NzQzfQ.a5SoWVBD6wbPt-CgQ4T57VDtF88Olu6Z6lYCNOHIp18",
+                "tokenrefresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiaWQiOiIxMWZlNzIzYS1iOTBiLTQwYTEtYjU2MS1lYjZiYzBiZWRmMTgifX0sImlhdCI6MTY0MzYwNzg0MywiZXhwIjoxNjQzNjA5NjQzfQ.c9AFw0TbhwU2W0lPLIaBRfHH9uWUw4feduzV4VOHYTI",
+                "data":{
+                  "name": "Emilio Fernado",
+                  "lastname": "Caraballo Dueñas",
+                  "email": "emiliocaraballo9810@gmail.com",
+                  "phone": "3017205180"
+                }
+              }
+            }
           },
           "message": {
             "type": "string",
-            "example": "Se ha registrado correctamente su número de ticket es 9"
+            "example": ""
           }
         }
-      },
+      },     
+      "SuccessDirection":{
+        "required": [
+          
+        ],
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": "1"
+          },
+          "data":{
+            "type":"array",
+            "items":{
+              "type":"object",
+              "example":
+              {
+                "title": "Cartagena de Indias República de Chile, Bolívar",
+                "position": {
+                    "lat": 10.39548,
+                    "lon": -75.51444
+                }
+              }
+            }
+          },
+          "message": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      },     
       "ErrorResponse": {
         "required": [
           "message"
